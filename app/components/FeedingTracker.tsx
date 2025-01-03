@@ -7,6 +7,15 @@ import { FeedingMode, FeedingSession, Settings as SettingsType, FeedingInterval 
 import SettingsPanel from './Settings';
 import Timer from './Timer';
 
+const getDefaultTimezone = () => {
+  if (typeof window === 'undefined') return 'UTC';
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    return 'UTC';
+  }
+};
+
 export default function FeedingTracker() {
   const [mounted, setMounted] = useState(false);
   const [selectedMode, setSelectedMode] = useState<FeedingMode | null>(null);
@@ -323,15 +332,6 @@ export default function FeedingTracker() {
   const handleSettingsChange = useCallback((newSettings: SettingsType) => {
     setSettings(newSettings);
   }, []);
-
-  const getDefaultTimezone = () => {
-    if (typeof window === 'undefined') return 'UTC';
-    try {
-      return Intl.DateTimeFormat().resolvedOptions().timeZone;
-    } catch {
-      return 'UTC';
-    }
-  };
 
   if (!mounted) {
     return (
