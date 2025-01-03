@@ -1,11 +1,17 @@
-export type FeedingMode = {
-  type: 'bottle' | 'breast';
-  side?: 'left' | 'right';
-  volume?: {
+export type BottleMode = {
+  type: 'bottle';
+  volume: {
     amount: number;
     unit: 'oz' | 'ml';
   };
 };
+
+export type BreastMode = {
+  type: 'breast';
+  side: 'left' | 'right';
+};
+
+export type FeedingMode = BottleMode | BreastMode;
 
 export interface FeedingInterval {
   mode: FeedingMode;

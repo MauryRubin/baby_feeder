@@ -16,6 +16,17 @@ const getDefaultTimezone = () => {
   }
 };
 
+// Move convertVolume outside useEffect to make it reusable
+const convertVolume = (amount: number, from: 'oz' | 'ml', to: 'oz' | 'ml'): number => {
+  if (from === to) return amount;
+  // Convert oz to ml
+  if (from === 'oz' && to === 'ml') {
+    return Number((amount * 29.5735).toFixed(0));
+  }
+  // Convert ml to oz
+  return Number((amount / 29.5735).toFixed(1));
+};
+
 export default function FeedingTracker() {
   const [mounted, setMounted] = useState(false);
   const [selectedMode, setSelectedMode] = useState<FeedingMode | null>(null);
@@ -39,16 +50,6 @@ export default function FeedingTracker() {
   useEffect(() => {
     // Convert volumes when unit changes
     if (settings.needsVolumeConversion && settings.previousUnit) {
-      const convertVolume = (amount: number, from: 'oz' | 'ml', to: 'oz' | 'ml'): number => {
-        if (from === to) return amount;
-        // Convert oz to ml
-        if (from === 'oz' && to === 'ml') {
-          return Number((amount * 29.5735).toFixed(0));
-        }
-        // Convert ml to oz
-        return Number((amount / 29.5735).toFixed(1));
-      };
-
       // Convert volumes in feeding intervals
       setFeedingIntervals(prevIntervals => 
         prevIntervals.map(interval => {
@@ -73,12 +74,12 @@ export default function FeedingTracker() {
       );
 
       // Convert volume in selected mode if it exists
-      if (selectedMode?.type === 'bottle' && selectedMode.volume) {
+      if (selectedMode?.type === 'bottle' && selectedMode?.volume?.amount) {
         setSelectedMode(prevMode => ({
           ...prevMode!,
           volume: {
             amount: convertVolume(
-              selectedMode.volume.amount,
+              selectedMode.volume!.amount,
               settings.previousUnit!,
               settings.volumeUnit
             ),
@@ -131,7 +132,7 @@ export default function FeedingTracker() {
         previousUnit: undefined
       }));
     }
-  }, [settings, selectedMode]);
+  }, [settings]);
 
   const isValidMode = (mode: FeedingMode | null): boolean => {
     if (!mode) return false;
