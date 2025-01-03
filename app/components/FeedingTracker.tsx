@@ -5,8 +5,8 @@ import FeedingModeSelector from './FeedingModeSelector';
 import FeedingClock from './FeedingClock';
 import FeedingHistory from './FeedingHistory';
 import TimezoneSelector from './TimezoneSelector';
-import { FeedingMode, FeedingSession, Settings, FeedingInterval } from '../types/feeding';
-import Settings from './Settings';
+import { FeedingMode, FeedingSession, Settings as SettingsType, FeedingInterval } from '../types/feeding';
+import SettingsPanel from './Settings';
 import Timer from './Timer';
 
 export default function FeedingTracker() {
@@ -15,7 +15,7 @@ export default function FeedingTracker() {
   const [isFeeding, setIsFeeding] = useState(false);
   const [feedingSessions, setFeedingSessions] = useState<FeedingSession[]>([]);
   const [startTime, setStartTime] = useState<Date | null>(null);
-  const [settings, setSettings] = useState<Settings>({
+  const [settings, setSettings] = useState<SettingsType>({
     timezone: (() => {
       try {
         return Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -348,7 +348,7 @@ export default function FeedingTracker() {
   }
 
   return (
-    <>
+    <div>
       <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <FeedingModeSelector 
           selectedMode={selectedMode} 
@@ -374,10 +374,10 @@ export default function FeedingTracker() {
           settings={settings}
         />
       </div>
-      <Settings 
+      <SettingsPanel 
         settings={settings}
-        onSettingsChange={setSettings}
+        onSettingsChange={handleSettingsChange}
       />
-    </>
+    </div>
   );
 } 
