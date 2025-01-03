@@ -1,15 +1,15 @@
-export type BottleMode = {
+export interface BottleMode {
   type: 'bottle';
   volume: {
     amount: number;
     unit: 'oz' | 'ml';
   };
-};
+}
 
-export type BreastMode = {
+export interface BreastMode {
   type: 'breast';
   side: 'left' | 'right';
-};
+}
 
 export type FeedingMode = BottleMode | BreastMode;
 

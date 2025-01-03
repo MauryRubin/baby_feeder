@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { FeedingSession, FeedingInterval, Settings } from '../types/feeding';
+import { FeedingSession, FeedingInterval, Settings, BottleMode, BreastMode } from '../types/feeding';
 
 type Props = {
   session: FeedingSession;
@@ -41,12 +41,16 @@ export default function EditFeedingModal({ session, onSave, onCancel, settings }
       const updated = [...prev];
       const currentInterval = { ...updated[index] };
 
+      // Type guard to check if mode is BottleMode
+      const isBottleMode = (mode: any): mode is BottleMode => 
+        mode?.type === 'bottle';
+
       if (updates.mode?.type === 'bottle') {
         // Preserve existing volume if available
         currentInterval.mode = {
           type: 'bottle',
           volume: {
-            amount: currentInterval.mode.type === 'bottle' ? currentInterval.mode.volume?.amount || 0 : 0,
+            amount: isBottleMode(currentInterval.mode) ? currentInterval.mode.volume?.amount || 0 : 0,
             unit: settings.volumeUnit
           }
         };
@@ -58,7 +62,7 @@ export default function EditFeedingModal({ session, onSave, onCancel, settings }
       }
 
       // Handle volume updates separately
-      if (updates.mode?.volume) {
+      if (isBottleMode(updates.mode) && updates.mode.volume) {
         currentInterval.mode = {
           type: 'bottle',
           volume: {
