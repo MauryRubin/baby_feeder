@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react';
-import { FeedingMode, FeedingSession, FeedingInterval, Settings } from '../types/feeding';
+import { FeedingSession, FeedingInterval, Settings } from '../types/feeding';
 
 type Props = {
   session: FeedingSession;

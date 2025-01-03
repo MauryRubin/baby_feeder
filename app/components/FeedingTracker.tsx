@@ -1,10 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import FeedingModeSelector from './FeedingModeSelector';
-import FeedingClock from './FeedingClock';
 import FeedingHistory from './FeedingHistory';
-import TimezoneSelector from './TimezoneSelector';
 import { FeedingMode, FeedingSession, Settings as SettingsType, FeedingInterval } from '../types/feeding';
 import SettingsPanel from './Settings';
 import Timer from './Timer';
@@ -16,13 +14,7 @@ export default function FeedingTracker() {
   const [feedingSessions, setFeedingSessions] = useState<FeedingSession[]>([]);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [settings, setSettings] = useState<SettingsType>({
-    timezone: (() => {
-      try {
-        return Intl.DateTimeFormat().resolvedOptions().timeZone;
-      } catch {
-        return 'UTC';
-      }
-    })(),
+    timezone: getDefaultTimezone(),
     volumeUnit: 'oz'
   });
   const [isPaused, setIsPaused] = useState(false);
@@ -73,8 +65,8 @@ export default function FeedingTracker() {
 
       // Convert volume in selected mode if it exists
       if (selectedMode?.type === 'bottle' && selectedMode.volume) {
-        setSelectedMode({
-          ...selectedMode,
+        setSelectedMode(prevMode => ({
+          ...prevMode!,
           volume: {
             amount: convertVolume(
               selectedMode.volume.amount,
@@ -83,7 +75,7 @@ export default function FeedingTracker() {
             ),
             unit: settings.volumeUnit
           }
-        });
+        }));
       }
 
       // Convert volumes in existing sessions
@@ -130,7 +122,7 @@ export default function FeedingTracker() {
         previousUnit: undefined
       }));
     }
-  }, [settings]);
+  }, [settings, selectedMode]);
 
   const isValidMode = (mode: FeedingMode | null): boolean => {
     if (!mode) return false;
@@ -326,6 +318,19 @@ export default function FeedingTracker() {
 
   const handleDeleteSession = (sessionId: string) => {
     setFeedingSessions(prev => prev.filter(session => session.id !== sessionId));
+  };
+
+  const handleSettingsChange = useCallback((newSettings: SettingsType) => {
+    setSettings(newSettings);
+  }, []);
+
+  const getDefaultTimezone = () => {
+    if (typeof window === 'undefined') return 'UTC';
+    try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch {
+      return 'UTC';
+    }
   };
 
   if (!mounted) {

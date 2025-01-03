@@ -12,23 +12,13 @@ type Props = {
 export default function Settings({ settings, onSettingsChange }: Props) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const convertVolume = (amount: number, from: 'oz' | 'ml', to: 'oz' | 'ml'): number => {
-    if (from === to) return amount;
-    // Convert oz to ml
-    if (from === 'oz' && to === 'ml') {
-      return Number((amount * 29.5735).toFixed(0));
-    }
-    // Convert ml to oz
-    return Number((amount / 29.5735).toFixed(1));
-  };
-
   const handleVolumeUnitChange = (newVolumeUnit: 'oz' | 'ml') => {
     if (newVolumeUnit === settings.volumeUnit) return;
     onSettingsChange({ 
       ...settings, 
       volumeUnit: newVolumeUnit,
-      needsVolumeConversion: true, // Add flag to indicate conversion needed
-      previousUnit: settings.volumeUnit // Store previous unit for conversion
+      needsVolumeConversion: true,
+      previousUnit: settings.volumeUnit
     });
   };
 

@@ -12,3 +12,8 @@ export default function Home() {
     </div>
   );
 }
+
+export const metadata = {
+  title: 'Baby Feeding Tracker',
+  description: 'Track your baby\'s feeding schedule and patterns',
+}
