@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react';
-import { FeedingSession, Settings } from '../types/feeding';
+import { FeedingSession, Settings, FeedingInterval } from '../types/feeding';
 import EditFeedingModal from './EditFeedingModal';
 
 type Props = {

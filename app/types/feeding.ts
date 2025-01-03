@@ -7,31 +7,26 @@ export type FeedingMode = {
   };
 };
 
-export type FeedingInterval = {
+export interface FeedingInterval {
   mode: FeedingMode;
   startTime: Date;
   endTime: Date;
   duration: number;
-};
+}
 
-export type PausedInterval = {
-  start: Date;
-  end: Date;
-};
-
-export type FeedingSession = {
+export interface FeedingSession {
   id: string;
   startTime: Date;
   endTime: Date;
   duration: number;
   mode: FeedingMode;
   feedingIntervals: FeedingInterval[];
-  pausedIntervals?: PausedInterval[];
-};
+  pausedIntervals: { start: Date; end?: Date }[];
+}
 
-export type Settings = {
+export interface Settings {
   timezone: string;
   volumeUnit: 'oz' | 'ml';
   needsVolumeConversion?: boolean;
   previousUnit?: 'oz' | 'ml';
-}; 
+} 
