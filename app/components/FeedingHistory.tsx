@@ -12,6 +12,9 @@ type Props = {
   settings: Settings;
 };
 
+const isBottleMode = (mode: FeedingMode): mode is BottleMode => 
+  mode.type === 'bottle';
+
 export default function FeedingHistory({ sessions, timezone, onUpdateSession, onDeleteSession, settings }: Props) {
   const [mounted, setMounted] = useState(false);
   const [editingSession, setEditingSession] = useState<FeedingSession | null>(null);
@@ -67,7 +70,7 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
       totalFeeds++;
       
       session.feedingIntervals.forEach(interval => {
-        if (interval.mode.type === 'bottle' && interval.mode.volume?.amount) {
+        if (isBottleMode(interval.mode)) {
           totalVolume += interval.mode.volume.amount;
         }
       });
@@ -90,9 +93,9 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
           break;
         case 'volume':
           const volumeA = a.feedingIntervals.reduce((sum, interval) => 
-            sum + (interval.mode.volume?.amount || 0), 0);
+            sum + (isBottleMode(interval.mode) ? interval.mode.volume.amount : 0), 0);
           const volumeB = b.feedingIntervals.reduce((sum, interval) => 
-            sum + (interval.mode.volume?.amount || 0), 0);
+            sum + (isBottleMode(interval.mode) ? interval.mode.volume.amount : 0), 0);
           comparison = volumeB - volumeA;
           break;
         case 'duration':
