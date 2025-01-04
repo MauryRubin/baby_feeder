@@ -7,12 +7,12 @@ const nextConfig = {
   },
   // Add specific Vercel configuration
   typescript: {
-    // Temporarily enable during development
-    ignoreBuildErrors: true
+    // Ignore type errors in production build
+    ignoreBuildErrors: process.env.VERCEL_ENV === 'production'
   },
   eslint: {
-    // Temporarily enable during development
-    ignoreDuringBuilds: true
+    // Ignore ESLint errors in production build
+    ignoreDuringBuilds: process.env.VERCEL_ENV === 'production'
   },
   // Add JSON serialization configuration
   experimental: {
