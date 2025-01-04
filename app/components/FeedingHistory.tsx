@@ -4,6 +4,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { FeedingSession, Settings, FeedingInterval, FeedingMode, BottleMode } from '../types/feeding';
 import EditFeedingModal from './EditFeedingModal';
 
+// Add helper for safe date conversion
+const toDate = (date: Date | string): Date => {
+  return date instanceof Date ? date : new Date(date);
+};
+
 type Props = {
   sessions: FeedingSession[];
   timezone: string;
@@ -27,15 +32,14 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
     setMounted(true);
   }, []);
 
-  const formatTime = (date: Date) => {
+  const formatTime = (date: Date | string) => {
     if (!mounted) return '--:--';
-    const dateObj = new Date(date);
     return new Intl.DateTimeFormat('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       timeZone: timezone,
       hour12: true,
-    }).format(dateObj);
+    }).format(toDate(date));
   };
 
   const formatDuration = (seconds: number) => {
@@ -49,13 +53,13 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
     setEditingSession(null);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
     if (!mounted) return '--/--';
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
       timeZone: timezone,
-    }).format(new Date(date));
+    }).format(toDate(date));
   };
 
   // Calculate stats
@@ -84,7 +88,7 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
     };
   }, [sessions]);
 
-  // Sort sessions
+  // Sort sessions with safe date handling
   const sortedSessions = useMemo(() => {
     const calculateTotalVolume = (session: FeedingSession) => {
       return session.feedingIntervals.reduce((sum, interval) => {
@@ -99,7 +103,7 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
       let comparison = 0;
       switch (sortBy) {
         case 'date':
-          comparison = new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+          comparison = toDate(b.startTime).getTime() - toDate(a.startTime).getTime();
           break;
         case 'volume':
           const volumeA = calculateTotalVolume(a);
@@ -119,8 +123,8 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
     const defaultInterval: FeedingInterval = {
       mode: { type: 'breast', side: 'left' },
       startTime: now,
-      endTime: new Date(now.getTime() + 15 * 60000), // 15 minutes later
-      duration: 900 // 15 minutes in seconds
+      endTime: new Date(now.getTime() + 15 * 60000),
+      duration: 900
     };
 
     const defaultSession: FeedingSession = {

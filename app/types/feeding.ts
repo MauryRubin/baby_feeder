@@ -15,19 +15,19 @@ export type FeedingMode = BottleMode | BreastMode;
 
 export interface FeedingInterval {
   mode: FeedingMode;
-  startTime: Date;
-  endTime: Date;
+  startTime: Date | string;
+  endTime: Date | string;
   duration: number;
 }
 
 export interface FeedingSession {
   id: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: Date | string;
+  endTime: Date | string;
   duration: number;
   mode: FeedingMode;
   feedingIntervals: FeedingInterval[];
-  pausedIntervals: { start: Date; end?: Date }[];
+  pausedIntervals: { start: Date | string; end?: Date | string }[];
 }
 
 export interface Settings {
