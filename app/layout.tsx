@@ -1,30 +1,23 @@
 import "./globals.css";
 import ErrorBoundary from './components/ErrorBoundary'
 
+export const metadata = {
+  title: 'Baby Feeding Tracker',
+  description: 'Track your baby\'s feeding sessions',
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+    <html lang="en">
+      <body>
         <ErrorBoundary>
           {children}
         </ErrorBoundary>
       </body>
     </html>
   );
-}
-
-export const metadata = {
-  icons: {
-    icon: [
-      { url: '/icon?size=32', sizes: '32x32', type: 'image/png' },
-      { url: '/icon?size=16', sizes: '16x16', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/icon?size=180', sizes: '180x180', type: 'image/png' },
-    ],
-  },
 }

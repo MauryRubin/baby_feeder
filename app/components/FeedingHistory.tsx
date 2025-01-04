@@ -4,9 +4,25 @@ import { useState, useEffect, useMemo } from 'react';
 import { FeedingSession, Settings, FeedingInterval, FeedingMode, BottleMode } from '../types/feeding';
 import EditFeedingModal from './EditFeedingModal';
 
-// Add helper for safe date conversion
+// Add type validation helper
+const isValidDate = (date: any): date is Date | string => {
+  if (date instanceof Date) return true;
+  if (typeof date === 'string') {
+    const parsed = new Date(date);
+    return !isNaN(parsed.getTime());
+  }
+  return false;
+};
+
+// Update the toDate function
 const toDate = (date: Date | string): Date => {
-  return date instanceof Date ? date : new Date(date);
+  if (date instanceof Date) return date;
+  const parsed = new Date(date);
+  if (isNaN(parsed.getTime())) {
+    console.error('Invalid date:', date);
+    return new Date(); // Fallback to current date
+  }
+  return parsed;
 };
 
 type Props = {

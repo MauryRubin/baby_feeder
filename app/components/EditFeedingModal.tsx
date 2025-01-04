@@ -97,66 +97,82 @@ export default function EditFeedingModal({ session, onSave, onCancel, settings }
   };
 
   const handleSave = () => {
-    // Validate all intervals
-    let isValid = true;
-    intervals.forEach((interval, index) => {
-      if (!validateTimeRange(new Date(interval.startTime), new Date(interval.endTime), index)) {
-        isValid = false;
+    try {
+      // Validate all dates before saving
+      const validDates = intervals.every(interval => {
+        const start = toDate(interval.startTime);
+        const end = toDate(interval.endTime);
+        return isValidDate(start) && isValidDate(end) && start <= end;
+      });
+
+      if (!validDates) {
+        throw new Error('Invalid date values detected');
       }
-    });
 
-    if (!isValid) {
-      return; // Don't save if there are validation errors
-    }
-
-    // Sort intervals by start time
-    const sortedIntervals = [...intervals].sort((a, b) => 
-      new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-    );
-
-    // Apply the selected date to all intervals
-    const [year, month, day] = date.split('-').map(Number);
-    sortedIntervals.forEach(interval => {
-      const startTime = new Date(interval.startTime);
-      const endTime = new Date(interval.endTime);
-      
-      startTime.setFullYear(year, month - 1, day);
-      endTime.setFullYear(year, month - 1, day);
-      
-      // Handle case where feeding crosses midnight
-      if (endTime < startTime) {
-        endTime.setDate(endTime.getDate() + 1);
-      }
-      
-      interval.startTime = startTime;
-      interval.endTime = endTime;
-    });
-
-    // Calculate total duration and validate times
-    let totalDuration = 0;
-    sortedIntervals.forEach((interval, i) => {
-      totalDuration += interval.duration;
-      
-      // Ensure intervals don't overlap
-      if (i > 0) {
-        const prevEnd = new Date(sortedIntervals[i-1].endTime);
-        if (new Date(interval.startTime) < prevEnd) {
-          interval.startTime = prevEnd;
-          interval.duration = Math.floor((new Date(interval.endTime).getTime() - prevEnd.getTime()) / 1000);
+      // Validate all intervals
+      let isValid = true;
+      intervals.forEach((interval, index) => {
+        if (!validateTimeRange(new Date(interval.startTime), new Date(interval.endTime), index)) {
+          isValid = false;
         }
+      });
+
+      if (!isValid) {
+        return; // Don't save if there are validation errors
       }
-    });
 
-    const updatedSession: FeedingSession = {
-      ...session,
-      startTime: sortedIntervals[0].startTime,
-      endTime: sortedIntervals[sortedIntervals.length - 1].endTime,
-      duration: totalDuration,
-      mode: sortedIntervals[sortedIntervals.length - 1].mode, // Last used mode
-      feedingIntervals: sortedIntervals
-    };
+      // Sort intervals by start time
+      const sortedIntervals = [...intervals].sort((a, b) => 
+        new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+      );
 
-    onSave(updatedSession);
+      // Apply the selected date to all intervals
+      const [year, month, day] = date.split('-').map(Number);
+      sortedIntervals.forEach(interval => {
+        const startTime = new Date(interval.startTime);
+        const endTime = new Date(interval.endTime);
+        
+        startTime.setFullYear(year, month - 1, day);
+        endTime.setFullYear(year, month - 1, day);
+        
+        // Handle case where feeding crosses midnight
+        if (endTime < startTime) {
+          endTime.setDate(endTime.getDate() + 1);
+        }
+        
+        interval.startTime = startTime;
+        interval.endTime = endTime;
+      });
+
+      // Calculate total duration and validate times
+      let totalDuration = 0;
+      sortedIntervals.forEach((interval, i) => {
+        totalDuration += interval.duration;
+        
+        // Ensure intervals don't overlap
+        if (i > 0) {
+          const prevEnd = new Date(sortedIntervals[i-1].endTime);
+          if (new Date(interval.startTime) < prevEnd) {
+            interval.startTime = prevEnd;
+            interval.duration = Math.floor((new Date(interval.endTime).getTime() - prevEnd.getTime()) / 1000);
+          }
+        }
+      });
+
+      const updatedSession: FeedingSession = {
+        ...session,
+        startTime: sortedIntervals[0].startTime,
+        endTime: sortedIntervals[sortedIntervals.length - 1].endTime,
+        duration: totalDuration,
+        mode: sortedIntervals[sortedIntervals.length - 1].mode, // Last used mode
+        feedingIntervals: sortedIntervals
+      };
+
+      onSave(updatedSession);
+    } catch (error) {
+      console.error('Save failed:', error);
+      // Handle error appropriately
+    }
   };
 
   const handleModeTypeChange = (index: number, newType: 'bottle' | 'breast') => {
