@@ -27,6 +27,10 @@ const convertVolume = (amount: number, from: 'oz' | 'ml', to: 'oz' | 'ml'): numb
   return Number((amount / 29.5735).toFixed(1));
 };
 
+// Add type guard helper
+const isBottleMode = (mode: FeedingMode): mode is BottleMode => 
+  mode.type === 'bottle';
+
 export default function FeedingTracker() {
   const [mounted, setMounted] = useState(false);
   const [selectedMode, setSelectedMode] = useState<FeedingMode | null>(null);
@@ -50,14 +54,13 @@ export default function FeedingTracker() {
   useEffect(() => {
     // Convert volumes when unit changes
     if (settings.needsVolumeConversion && settings.previousUnit) {
-      // Convert volumes in feeding intervals
       setFeedingIntervals(prevIntervals => 
         prevIntervals.map(interval => {
-          if (interval.mode.type === 'bottle' && interval.mode.volume) {
+          if (isBottleMode(interval.mode)) {
             return {
               ...interval,
               mode: {
-                ...interval.mode,
+                type: 'bottle',
                 volume: {
                   amount: convertVolume(
                     interval.mode.volume.amount,
@@ -104,11 +107,11 @@ export default function FeedingTracker() {
             }
           } : session.mode,
           feedingIntervals: session.feedingIntervals.map(interval => {
-            if (interval.mode.type === 'bottle' && interval.mode.volume) {
+            if (isBottleMode(interval.mode)) {
               return {
                 ...interval,
                 mode: {
-                  ...interval.mode,
+                  type: 'bottle',
                   volume: {
                     amount: convertVolume(
                       interval.mode.volume.amount,

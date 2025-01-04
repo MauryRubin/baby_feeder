@@ -159,6 +159,31 @@ export default function EditFeedingModal({ session, onSave, onCancel, settings }
     onSave(updatedSession);
   };
 
+  const handleModeTypeChange = (index: number, newType: 'bottle' | 'breast') => {
+    setIntervals(prev => {
+      const updated = [...prev];
+      const currentInterval = { ...updated[index] };
+
+      if (newType === 'bottle') {
+        currentInterval.mode = {
+          type: 'bottle',
+          volume: {
+            amount: 0,
+            unit: settings.volumeUnit
+          }
+        };
+      } else {
+        currentInterval.mode = {
+          type: 'breast',
+          side: 'left'
+        };
+      }
+
+      updated[index] = currentInterval;
+      return updated;
+    });
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
@@ -209,9 +234,7 @@ export default function EditFeedingModal({ session, onSave, onCancel, settings }
                     </label>
                     <select
                       value={interval.mode.type}
-                      onChange={(e) => handleIntervalUpdate(index, {
-                        mode: { ...interval.mode, type: e.target.value as 'bottle' | 'breast' }
-                      })}
+                      onChange={(e) => handleModeTypeChange(index, e.target.value as 'bottle' | 'breast')}
                       className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md"
                     >
                       <option value="bottle">Bottle</option>
