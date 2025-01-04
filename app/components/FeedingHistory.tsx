@@ -12,6 +12,7 @@ type Props = {
   settings: Settings;
 };
 
+// Type guard for bottle mode
 const isBottleMode = (mode: FeedingMode): mode is BottleMode => 
   mode.type === 'bottle';
 
@@ -92,6 +93,7 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
           comparison = new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
           break;
         case 'volume':
+          // Calculate total volume for session A
           const volumeA = a.feedingIntervals.reduce((sum, interval) => {
             if (isBottleMode(interval.mode)) {
               return sum + interval.mode.volume.amount;
@@ -99,6 +101,7 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
             return sum;
           }, 0);
           
+          // Calculate total volume for session B
           const volumeB = b.feedingIntervals.reduce((sum, interval) => {
             if (isBottleMode(interval.mode)) {
               return sum + interval.mode.volume.amount;
