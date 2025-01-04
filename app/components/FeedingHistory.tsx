@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react';
-import { FeedingSession, Settings, FeedingInterval } from '../types/feeding';
+import { FeedingSession, Settings, FeedingInterval, FeedingMode, BottleMode } from '../types/feeding';
 import EditFeedingModal from './EditFeedingModal';
 
 type Props = {
@@ -92,10 +92,20 @@ export default function FeedingHistory({ sessions, timezone, onUpdateSession, on
           comparison = new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
           break;
         case 'volume':
-          const volumeA = a.feedingIntervals.reduce((sum, interval) => 
-            sum + (isBottleMode(interval.mode) ? interval.mode.volume.amount : 0), 0);
-          const volumeB = b.feedingIntervals.reduce((sum, interval) => 
-            sum + (isBottleMode(interval.mode) ? interval.mode.volume.amount : 0), 0);
+          const volumeA = a.feedingIntervals.reduce((sum, interval) => {
+            if (isBottleMode(interval.mode)) {
+              return sum + interval.mode.volume.amount;
+            }
+            return sum;
+          }, 0);
+          
+          const volumeB = b.feedingIntervals.reduce((sum, interval) => {
+            if (isBottleMode(interval.mode)) {
+              return sum + interval.mode.volume.amount;
+            }
+            return sum;
+          }, 0);
+          
           comparison = volumeB - volumeA;
           break;
         case 'duration':
