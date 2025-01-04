@@ -184,6 +184,15 @@ export default function EditFeedingModal({ session, onSave, onCancel, settings }
     });
   };
 
+  const handleSideChange = (index: number, newSide: 'left' | 'right') => {
+    handleIntervalUpdate(index, {
+      mode: {
+        type: 'breast',
+        side: newSide
+      }
+    });
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
@@ -249,9 +258,7 @@ export default function EditFeedingModal({ session, onSave, onCancel, settings }
                       </label>
                       <select
                         value={interval.mode.side || 'left'}
-                        onChange={(e) => handleIntervalUpdate(index, {
-                          mode: { ...interval.mode, side: e.target.value as 'left' | 'right' }
-                        })}
+                        onChange={(e) => handleSideChange(index, e.target.value as 'left' | 'right')}
                         className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md"
                       >
                         <option value="left">Left</option>
